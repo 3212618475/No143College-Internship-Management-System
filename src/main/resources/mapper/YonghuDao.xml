@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dao.YonghuDao">
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        a.id as id
+        ,a.yuanxi_id as yuanxiId
+        ,a.banji_id as banjiId
+        ,a.username as username
+        ,a.password as password
+        ,a.yonghu_name as yonghuName
+        ,a.yonghu_phone as yonghuPhone
+        ,a.yonghu_id_number as yonghuIdNumber
+        ,a.yonghu_photo as yonghuPhoto
+        ,a.sex_types as sexTypes
+        ,a.yonghu_email as yonghuEmail
+        ,a.create_time as createTime
+    </sql>
+    <select id="selectListView" parameterType="map" resultType="com.entity.view.YonghuView" >
+        SELECT
+        <include refid="Base_Column_List" />
+        <!-- 级联表的字段 -->
+        ,banji.banji_uuid_number as banjiUuidNumber
+        ,banji.banji_name as banjiName
+        ,banji.banji_address as banjiAddress
+        ,banji.banji_content as banjiContent
+        ,yuanxi.yuanxi_uuid_number as yuanxiUuidNumber
+        ,yuanxi.yuanxi_name as yuanxiName
+        ,yuanxi.yuanxi_address as yuanxiAddress
+        ,yuanxi.yuanxi_content as yuanxiContent
+
+        FROM yonghu  a
+        left JOIN banji banji ON a.banji_id = banji.id
+        left JOIN yuanxi yuanxi ON a.yuanxi_id = yuanxi.id
+
+        <where>
+            <if test="params.ids != null">
+                and a.id in
+                <foreach item="item" index="index" collection="params.ids" open="(" separator="," close=")">
+                #{item}
+                </foreach>
+            </if>
+            <if test="params.yuanxiId != null and params.yuanxiId != ''">
+                and (
+                    a.yuanxi_id = #{params.yuanxiId}
+                )
+            </if>
+            <if test="params.banjiId != null and params.banjiId != ''">
+                and (
+                    a.banji_id = #{params.banjiId}
+                )
+            </if>
+            <if test=" params.username != '' and params.username != null and params.username != 'null' ">
+                and a.username like CONCAT('%',#{params.username},'%')
+            </if>
+            <if test=" params.password != '' and params.password != null and params.password != 'null' ">
+                and a.password like CONCAT('%',#{params.password},'%')
+            </if>
+            <if test=" params.yonghuName != '' and params.yonghuName != null and params.yonghuName != 'null' ">
+                and a.yonghu_name like CONCAT('%',#{params.yonghuName},'%')
+            </if>
+            <if test=" params.yonghuPhone != '' and params.yonghuPhone != null and params.yonghuPhone != 'null' ">
+                and a.yonghu_phone like CONCAT('%',#{params.yonghuPhone},'%')
+            </if>
+            <if test=" params.yonghuIdNumber != '' and params.yonghuIdNumber != null and params.yonghuIdNumber != 'null' ">
+                and a.yonghu_id_number like CONCAT('%',#{params.yonghuIdNumber},'%')
+            </if>
+            <if test="params.sexTypes != null and params.sexTypes != ''">
+                and a.sex_types = #{params.sexTypes}
+            </if>
+            <if test=" params.yonghuEmail != '' and params.yonghuEmail != null and params.yonghuEmail != 'null' ">
+                and a.yonghu_email like CONCAT('%',#{params.yonghuEmail},'%')
+            </if>
+
+                <!-- 判断班级的id不为空 -->
+            <if test=" params.banjiIdNotNull != '' and params.banjiIdNotNull != null and params.banjiIdNotNull != 'null' ">
+                and a.banji_id IS NOT NULL
+            </if>
+            <if test=" params.banjiUuidNumber != '' and params.banjiUuidNumber != null and params.banjiUuidNumber != 'null' ">
+                and banji.banji_uuid_number like CONCAT('%',#{params.banjiUuidNumber},'%')
+            </if>
+            <if test=" params.banjiName != '' and params.banjiName != null and params.banjiName != 'null' ">
+                and banji.banji_name like CONCAT('%',#{params.banjiName},'%')
+            </if>
+            <if test=" params.banjiAddress != '' and params.banjiAddress != null and params.banjiAddress != 'null' ">
+                and banji.banji_address like CONCAT('%',#{params.banjiAddress},'%')
+            </if>
+            <if test=" params.banjiContent != '' and params.banjiContent != null and params.banjiContent != 'null' ">
+                and banji.banji_content like CONCAT('%',#{params.banjiContent},'%')
+            </if>
+            <if test=" params.insertTimeStart != '' and params.insertTimeStart != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(banji.insert_time) >= UNIX_TIMESTAMP(#{params.insertTimeStart}) ]]>
+            </if>
+            <if test=" params.insertTimeEnd != '' and params.insertTimeEnd != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(banji.insert_time) <= UNIX_TIMESTAMP(#{params.insertTimeEnd}) ]]>
+            </if>
+            <if test="params.insertTime != null and params.insertTime != ''">
+                and a.insert_time = #{params.insertTime}
+            </if>
+                <!-- 判断院系的id不为空 -->
+            <if test=" params.yuanxiIdNotNull != '' and params.yuanxiIdNotNull != null and params.yuanxiIdNotNull != 'null' ">
+                and a.yuanxi_id IS NOT NULL
+            </if>
+            <if test=" params.yuanxiUuidNumber != '' and params.yuanxiUuidNumber != null and params.yuanxiUuidNumber != 'null' ">
+                and yuanxi.yuanxi_uuid_number like CONCAT('%',#{params.yuanxiUuidNumber},'%')
+            </if>
+            <if test=" params.yuanxiName != '' and params.yuanxiName != null and params.yuanxiName != 'null' ">
+                and yuanxi.yuanxi_name like CONCAT('%',#{params.yuanxiName},'%')
+            </if>
+            <if test=" params.yuanxiAddress != '' and params.yuanxiAddress != null and params.yuanxiAddress != 'null' ">
+                and yuanxi.yuanxi_address like CONCAT('%',#{params.yuanxiAddress},'%')
+            </if>
+            <if test=" params.yuanxiContent != '' and params.yuanxiContent != null and params.yuanxiContent != 'null' ">
+                and yuanxi.yuanxi_content like CONCAT('%',#{params.yuanxiContent},'%')
+            </if>
+            <if test=" params.insertTimeStart != '' and params.insertTimeStart != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(yuanxi.insert_time) >= UNIX_TIMESTAMP(#{params.insertTimeStart}) ]]>
+            </if>
+            <if test=" params.insertTimeEnd != '' and params.insertTimeEnd != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(yuanxi.insert_time) <= UNIX_TIMESTAMP(#{params.insertTimeEnd}) ]]>
+            </if>
+            <if test="params.insertTime != null and params.insertTime != ''">
+                and a.insert_time = #{params.insertTime}
+            </if>
+        </where>
+        order by a.${params.sort} ${params.order}
+    </select>
+
+</mapper>

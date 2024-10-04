@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dao.ZhaopinDao">
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        a.id as id
+        ,a.gongsi_id as gongsiId
+        ,a.zhaopin_name as zhaopinName
+        ,a.zhaopin_photo as zhaopinPhoto
+        ,a.zhaopin_daiyu as zhaopinDaiyu
+        ,a.zhaopin_address as zhaopinAddress
+        ,a.lianxiren_name as lianxirenName
+        ,a.zhaopin_phone as zhaopinPhone
+        ,a.zan_number as zanNumber
+        ,a.cai_number as caiNumber
+        ,a.zhaopin_types as zhaopinTypes
+        ,a.leixing_types as leixingTypes
+        ,a.zhaopin_renshu_number as zhaopinRenshuNumber
+        ,a.zhaopin_content as zhaopinContent
+        ,a.create_time as createTime
+    </sql>
+    <select id="selectListView" parameterType="map" resultType="com.entity.view.ZhaopinView" >
+        SELECT
+        <include refid="Base_Column_List" />
+        <!-- 级联表的字段 -->
+        ,gongsi.gongsi_name as gongsiName
+        ,gongsi.gongsi_types as gongsiTypes
+        ,gongsi.gongsi_phone as gongsiPhone
+        ,gongsi.gongsi_email as gongsiEmail
+        ,gongsi.gongsi_photo as gongsiPhoto
+        ,gongsi.gongsi_content as gongsiContent
+        ,gongsi.gongsi_delete as gongsiDelete
+
+        FROM zhaopin  a
+        left JOIN gongsi gongsi ON a.gongsi_id = gongsi.id
+
+        <where>
+            <if test="params.ids != null">
+                and a.id in
+                <foreach item="item" index="index" collection="params.ids" open="(" separator="," close=")">
+                #{item}
+                </foreach>
+            </if>
+            <if test="params.gongsiId != null and params.gongsiId != ''">
+                and (
+                    a.gongsi_id = #{params.gongsiId}
+                )
+            </if>
+            <if test=" params.zhaopinName != '' and params.zhaopinName != null and params.zhaopinName != 'null' ">
+                and a.zhaopin_name like CONCAT('%',#{params.zhaopinName},'%')
+            </if>
+            <if test=" params.zhaopinDaiyu != '' and params.zhaopinDaiyu != null and params.zhaopinDaiyu != 'null' ">
+                and a.zhaopin_daiyu like CONCAT('%',#{params.zhaopinDaiyu},'%')
+            </if>
+            <if test=" params.zhaopinAddress != '' and params.zhaopinAddress != null and params.zhaopinAddress != 'null' ">
+                and a.zhaopin_address like CONCAT('%',#{params.zhaopinAddress},'%')
+            </if>
+            <if test=" params.lianxirenName != '' and params.lianxirenName != null and params.lianxirenName != 'null' ">
+                and a.lianxiren_name like CONCAT('%',#{params.lianxirenName},'%')
+            </if>
+            <if test=" params.zhaopinPhone != '' and params.zhaopinPhone != null and params.zhaopinPhone != 'null' ">
+                and a.zhaopin_phone like CONCAT('%',#{params.zhaopinPhone},'%')
+            </if>
+            <if test="params.zanNumberStart != null and params.zanNumberStart != ''">
+                <![CDATA[  and a.zan_number >= #{params.zanNumberStart}   ]]>
+            </if>
+            <if test="params.zanNumberEnd != null and params.zanNumberEnd != ''">
+                <![CDATA[  and a.zan_number <= #{params.zanNumberEnd}   ]]>
+            </if>
+             <if test="params.zanNumber != null and params.zanNumber != ''">
+                and a.zan_number = #{params.zanNumber}
+             </if>
+            <if test="params.caiNumberStart != null and params.caiNumberStart != ''">
+                <![CDATA[  and a.cai_number >= #{params.caiNumberStart}   ]]>
+            </if>
+            <if test="params.caiNumberEnd != null and params.caiNumberEnd != ''">
+                <![CDATA[  and a.cai_number <= #{params.caiNumberEnd}   ]]>
+            </if>
+             <if test="params.caiNumber != null and params.caiNumber != ''">
+                and a.cai_number = #{params.caiNumber}
+             </if>
+            <if test="params.zhaopinTypes != null and params.zhaopinTypes != ''">
+                and a.zhaopin_types = #{params.zhaopinTypes}
+            </if>
+            <if test="params.leixingTypes != null and params.leixingTypes != ''">
+                and a.leixing_types = #{params.leixingTypes}
+            </if>
+            <if test="params.zhaopinRenshuNumberStart != null and params.zhaopinRenshuNumberStart != ''">
+                <![CDATA[  and a.zhaopin_renshu_number >= #{params.zhaopinRenshuNumberStart}   ]]>
+            </if>
+            <if test="params.zhaopinRenshuNumberEnd != null and params.zhaopinRenshuNumberEnd != ''">
+                <![CDATA[  and a.zhaopin_renshu_number <= #{params.zhaopinRenshuNumberEnd}   ]]>
+            </if>
+             <if test="params.zhaopinRenshuNumber != null and params.zhaopinRenshuNumber != ''">
+                and a.zhaopin_renshu_number = #{params.zhaopinRenshuNumber}
+             </if>
+            <if test=" params.zhaopinContent != '' and params.zhaopinContent != null and params.zhaopinContent != 'null' ">
+                and a.zhaopin_content like CONCAT('%',#{params.zhaopinContent},'%')
+            </if>
+
+                <!-- 判断公司的id不为空 -->
+            <if test=" params.gongsiIdNotNull != '' and params.gongsiIdNotNull != null and params.gongsiIdNotNull != 'null' ">
+                and a.gongsi_id IS NOT NULL
+            </if>
+            <if test=" params.gongsiName != '' and params.gongsiName != null and params.gongsiName != 'null' ">
+                and gongsi.gongsi_name like CONCAT('%',#{params.gongsiName},'%')
+            </if>
+            <if test="params.gongsiTypes != null  and params.gongsiTypes != ''">
+                and gongsi.gongsi_types = #{params.gongsiTypes}
+            </if>
+
+            <if test=" params.gongsiPhone != '' and params.gongsiPhone != null and params.gongsiPhone != 'null' ">
+                and gongsi.gongsi_phone like CONCAT('%',#{params.gongsiPhone},'%')
+            </if>
+            <if test=" params.gongsiEmail != '' and params.gongsiEmail != null and params.gongsiEmail != 'null' ">
+                and gongsi.gongsi_email like CONCAT('%',#{params.gongsiEmail},'%')
+            </if>
+            <if test=" params.gongsiContent != '' and params.gongsiContent != null and params.gongsiContent != 'null' ">
+                and gongsi.gongsi_content like CONCAT('%',#{params.gongsiContent},'%')
+            </if>
+            <if test="params.gongsiDeleteStart != null  and params.gongsiDeleteStart != '' ">
+                <![CDATA[  and gongsi.gongsi_delete >= #{params.gongsiDeleteStart}   ]]>
+            </if>
+            <if test="params.gongsiDeleteEnd != null  and params.gongsiDeleteEnd != '' ">
+                <![CDATA[  and gongsi.gongsi_delete <= #{params.gongsiDeleteEnd}   ]]>
+            </if>
+            <if test="params.gongsiDelete != null  and params.gongsiDelete != '' ">
+                and gongsi.gongsi_delete = #{params.gongsiDelete}
+            </if>
+        </where>
+        order by a.${params.sort} ${params.order}
+    </select>
+
+</mapper>
